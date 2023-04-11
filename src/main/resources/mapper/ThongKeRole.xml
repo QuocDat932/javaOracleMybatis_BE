@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.javaOracleMybatisWebix.mapper.ThongKeRoleMapper">
+	<resultMap type="com.javaOracleMybatisWebix.model.ThongKeRole"
+		id="ThongKeRoleMap">
+		<result column="roleid" property="roleId"/>
+		<result column="rolename" property="roleName"/>
+		<result column="descriptions" property="descriptions"/>
+		<result column="isuse" property="isUse"/>
+		<result column="soLuong" property="soLuong"/>
+	</resultMap>
+	
+	<resultMap type="com.javaOracleMybatisWebix.model.ThongKeRole"
+		id="ThongKeRoleTheoTrangThaiMap">
+		<result column="isuse" property="isUse"/>
+		<result column="soLuong" property="soLuong"/>
+	</resultMap>
+	
+	<select id="listThongKeNguoiDungTheoRole" resultMap="ThongKeRoleMap">
+		SELECT r.roleid
+		     , r.rolename
+		     , COUNT(usr.roleid) soLuong
+		     , r.descriptions
+		     , r.isuse
+		FROM SYSTEM.inv_hr_role R LEFT JOIN SYSTEM.inv_hr_user USR ON usr.roleid = r.roleid 
+		GROUP BY r.roleid, r.rolename, r.isuse, r.descriptions
+		ORDER BY r.roleid
+	</select>
+	
+	<select id="listThongKeVaiTroTheoTrangThai" resultMap="ThongKeRoleMap"> <!-- ThongKeRoleTheoTrangThaiMap  -->
+		SELECT r.isuse
+		     , count(r.isuse) soLuong
+		FROM SYSTEM.inv_hr_role R
+		GROUP BY r.isuse
+	</select>
+	<!-- call function AnhDev_SUMAB -->
+	<select id="AnhDev_SUMAB" statementType="CALLABLE" parameterType="map">
+		DECLARE
+			SUMAB NUMBER := -1;
+		BEGIN
+			SUMAB := ANHDEV_SUMAB_F(
+				#{numberA,jdbcType=INTEGER,mode=IN},
+				#{numberB,jdbcType=INTEGER,mode=IN});
+			
+			#{result,jdbcType=INTEGER,mode=OUT} := SUMAB;
+		END;
+	</select>
+	
+	<!-- call Procedure JW_GET_ROLE_BY_ID -->
+	<resultMap id="roleCURMap" type="com.javaOracleMybatisWebix.model.Role">
+	  <result column="ROLEID" property="roleId" />
+	  <result column="ROLENAME" property="roleName" />
+	</resultMap>
+
+	<select id="checkRoleById_P" 
+		statementType="CALLABLE" 
+		parameterType="map" 
+		resultType="map">
+  		{call SYSTEM.JW_GET_ROLE_BY_ID(#{roleId, mode=IN, jdbcType=INTEGER}, 
+  								#{roleCUR, mode=OUT, jdbcType=CURSOR, javaType=java.sql.ResultSet,resultMap=roleCURMap})}
+	</select>
+	
+</mapper>

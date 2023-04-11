@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.javaOracleMybatisWebix.mapper.KhachHangMapper">
+	<resultMap type="com.javaOracleMybatisWebix.model.KhachHang"
+		id="KhachHangMap">
+		<result column="MAKH" property="maKh"/>
+		<result column="TENKH" property="tenKh"/>
+		<result column="DIACHI" property="diaChi"/>
+		<result column="MAIL" property="mail"/>
+		<result column="PHONE" property="phone"/>
+		<result column="IMAGE" property="img"/>
+		<result column="BIRTHDAY" property="birthday"/>
+		<result column="ISUSE" property="isUse"/>
+		<result column="ROLEID" property="roleId"/>
+		<result column="ROLEID" property="roleId"/>
+	</resultMap>
+	<select id="getAllKhachHang" resultMap="KhachHangMap">
+		SELECT usr.MAKH,
+		       usr.TENKH,
+		       usr.DIACHI,
+		       usr.MAIL,
+		       usr.PHONE,
+		       usr.IMAGE,
+		       TO_CHAR(usr.BIRTHDAY,'YYYY-MM-DD') BIRTHDAY,
+		       usr.ISUSE,
+		       usr.ROLEID,
+		       ROLENAME
+		FROM SYSTEM.INV_HR_USER usr LEFT JOIN SYSTEM.inv_hr_role role 
+											ON role.roleid = usr.roleid
+		WHERE 1 = 1
+		ORDER BY usr.MAKH ASC
+	</select>
+	
+	<insert id="insertKhachHang">
+		INSERT INTO SYSTEM.INV_HR_USER 
+				(TENKH, 
+				 DIACHI, 
+				 MAIL, 
+				 PHONE, 
+				 IMAGE, 
+				 BIRTHDAY,
+				 ISUSE,
+				 ROLEID)
+		VALUES(
+				#{tenKh},
+				#{diaChi},
+				#{mail},
+				#{phone},
+				#{img},
+				TO_DATE(#{birthday},'DD/MM/YYYY'),
+				#{isUse},
+				#{roleId}
+		)
+	</insert>
+	
+	<update id="updateKhachHang">
+		UPDATE SYSTEM.INV_HR_USER
+		SET  TENKH = #{tenKh}, 
+			 DIACHI= #{diaChi}, 
+			 MAIL  = #{mail},
+			 PHONE = #{phone},
+			 IMAGE = #{img},
+			 BIRTHDAY = TO_DATE(#{birthday},'DD/MM/YYYY'),
+			 ISUSE = #{isUse},
+			 ROLEID = #{roleId}
+		WHERE MAKH = #{maKh}
+	</update>
+	
+	<delete id="deleteKhachHang">
+		DELETE
+		FROM SYSTEM.INV_HR_USER
+		WHERE MAKH = #{maKh}
+	</delete>
+	
+	<select id="getKhachHangByParam" resultMap="KhachHangMap">
+		SELECT usr.MAKH,
+		       usr.TENKH,
+		       usr.DIACHI,
+		       usr.MAIL,
+		       usr.PHONE,
+		       usr.IMAGE,
+		       TO_CHAR(usr.BIRTHDAY,'YYYY-MM-DD') BIRTHDAY,
+		       usr.ISUSE,
+		       usr.ROLEID,
+		       ROLENAME
+		FROM SYSTEM.INV_HR_USER usr LEFT JOIN SYSTEM.inv_hr_role role 
+											ON role.roleid = usr.roleid
+		WHERE 1 = 1
+	   <if test="maKh != null and maKh != ''">
+		   AND usr.MAKH = #{maKh}
+	   </if>
+	</select>
+	
+	<select id="getListKhachHangByParam" resultMap="KhachHangMap">
+		SELECT usr.MAKH,
+		       usr.TENKH,
+		       usr.DIACHI,
+		       usr.MAIL,
+		       usr.PHONE,
+		       usr.IMAGE,
+		       TO_CHAR(usr.BIRTHDAY,'YYYY-MM-DD') BIRTHDAY,
+		       usr.ISUSE,
+		       usr.ROLEID,
+		       ROLENAME
+		FROM SYSTEM.INV_HR_USER usr LEFT JOIN SYSTEM.inv_hr_role role 
+											ON role.roleid = usr.roleid
+		WHERE 1 = 1
+		 <if test="tenKh != null and tenKh != ''">
+		 	AND UPPER(usr.TENKH) LIKE '%'||UPPER(#{tenKh})||'%'
+		 </if>
+	     <if test="!lstRoleId.isEmpty()">
+		    AND role.roleid IN
+		    	<foreach collection="lstRoleId" open="(" separator="," close=")" item="roleId">
+		    			#{roleId}
+		    	</foreach>
+	     </if>
+	     ORDER BY usr.MAKH
+	</select>
+</mapper>

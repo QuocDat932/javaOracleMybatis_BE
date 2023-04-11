@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.javaOracleMybatisWebix.mapper.RoleMapper">
+	<resultMap type="com.javaOracleMybatisWebix.model.Role"
+		id="RoleMap">
+		<result column="roleid" property="roleId"/>
+		<result column="rolename" property="roleName"/>
+		<result column="descriptions" property="descriptions"/>
+		<result column="isuse" property="isUse"/>
+	</resultMap>
+	<select id="getAllRole" resultMap="RoleMap">
+		SELECT roleid,
+		       rolename,
+		       isuse,
+		       descriptions
+		FROM SYSTEM.INV_HR_ROLE
+	</select>
+	<select id="getRoleByIsUse" resultMap="RoleMap">
+		SELECT roleid,
+		       rolename,
+		       isuse,
+		       descriptions
+		FROM SYSTEM.INV_HR_ROLE
+		WHERE isuse = #{isUse}
+	</select>
+	<select id="getNextRoleId" resultType="Integer">
+		SELECT MAX(roleid) + 1
+		FROM SYSTEM.INV_HR_ROLE
+	</select>
+	<insert id="saveNewRole">
+		INSERT INTO SYSTEM.INV_HR_ROLE (roleid
+									   ,rolename
+									   ,isuse
+									   ,descriptions)
+								VALUES (#{roleId}
+									   ,#{roleName}
+									   ,#{isUse}
+									   ,#{descriptions}	
+								)
+	</insert>
+	<update id="updateRole">
+		UPDATE SYSTEM.INV_HR_ROLE
+		SET rolename = #{roleName},
+			isuse = #{isUse},
+			descriptions = #{descriptions}
+		WHERE roleid = #{roleId}
+	</update>
+	
+</mapper>
